@@ -45,13 +45,15 @@ class SpendingMyTime
   end
 
   def log(time_spent, activity)
-    @db.execute "insert into time_spent values ( ?, ?, ? )", [Time.now.utc.iso8601, activity, time_spent]
+    @db.execute "insert into time_spent(created_at, category, minutes_spent) values ( ?, ?, ? )",
+      [Time.now.utc.iso8601, activity, time_spent]
   end
 
   def create_table!
     # Create a table
     rows = @db.execute <<-SQL
       create table if not exists time_spent (
+        id INTEGER PRIMARY KEY,
         created_at varchar(30),
         category varchar(255),
         minutes_spent int
