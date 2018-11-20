@@ -36,7 +36,7 @@ class SpendingMyTime
 
   def last_created_at
     @last_created_at ||= @db.execute( "select MAX(created_at) from time_spent" ) do |row|
-      return Time.iso8601(row[0])
+      return row[0] ? Time.iso8601(row[0]) : nil
     end
   end
 
@@ -60,7 +60,7 @@ class SpendingMyTime
   end
 
   def last_activity_was_today?
-    last_created_at.day == Time.now.utc.day
+    last_created_at && last_created_at.day == Time.now.utc.day
   end
 
 end
