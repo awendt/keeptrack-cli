@@ -7,6 +7,54 @@ require "time"
 
 class SpendingMyTime
 
+  class Today
+
+    def initialize(db)
+      @db = db
+    end
+
+    def summarize
+      @db.execute(<<-SQL) do |row|
+        SELECT time(created_at, 'utc', 'localtime'), category, minutes_spent FROM time_spent
+        WHERE created_at >= date('now', 'start of day')
+      SQL
+        print_line(timestamp: row[0], category: row[1], minutes: row[2])
+      end
+      print_sum
+    end
+
+    private
+
+    def print_line(timestamp:, category:, minutes:)
+      puts [
+        timestamp,
+        category.ljust(max_category_length),
+        minutes.to_s.rjust(2)
+      ].join(' | ')
+    end
+
+    def print_sum
+      line_length = (max_category_length + 16)
+      puts '-' * line_length
+      puts time_spent_today.rjust(line_length)
+    end
+
+    def time_spent_today
+      @db.get_first_value(<<-SQL)
+        SELECT strftime('%H:%M', SUM(minutes_spent)*60, 'unixepoch') FROM time_spent
+        WHERE created_at >= date('now', 'start of day')
+      SQL
+    end
+
+    def max_category_length
+      @max_category_length ||= @db.get_first_value(<<-SQL).to_i
+        SELECT MAX(LENGTH(category)) FROM time_spent
+        WHERE created_at >= date('now', 'start of day')
+      SQL
+    end
+
+  end
+
   def initialize
     @db = SQLite3::Database.new "smt.db"
 
@@ -17,6 +65,11 @@ class SpendingMyTime
     time_spent = ask("How many minutes would you like to log? ", suggestion).to_i
     activity = ask("For what? ")
     log(time_spent, activity)
+    summarize_today
+  end
+
+  def summarize_today
+    Today.new(@db).summarize
   end
 
   def ask(prompt, suggestion=nil)
