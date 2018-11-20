@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+trap("SIGINT") { exit(0) }
+
 require "sqlite3"
 require "time"
 
