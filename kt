@@ -56,7 +56,7 @@ class KeepTrack
   end
 
   def initialize
-    @db = SQLite3::Database.new "smt.db"
+    @db = SQLite3::Database.new "keeptrack.db"
 
     create_table!
   end
