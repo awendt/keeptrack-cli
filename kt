@@ -5,7 +5,7 @@ trap("SIGINT") { exit(0) }
 require "sqlite3"
 require "time"
 
-class SpendingMyTime
+class KeepTrack
 
   class Today
 
@@ -120,4 +120,4 @@ class SpendingMyTime
 
 end
 
-SpendingMyTime.new.record_time_spent
+KeepTrack.new.record_time_spent
