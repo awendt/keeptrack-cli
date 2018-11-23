@@ -73,7 +73,7 @@ class KeepTrack
   end
 
   def ask(prompt, suggestion=nil)
-    print(suggestion ? prompt + "(#{suggestion})" : prompt)
+    print(suggestion ? prompt + "(#{suggestion}) " : prompt)
     input = gets.chomp
 
     return suggestion if input == "" && suggestion
